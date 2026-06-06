@@ -66,7 +66,7 @@ export default function App() {
           <button className={`tab ${tab === 'matrix' ? 'active' : ''}`} onClick={() => setTab('matrix')}>Synthesis matrix</button>
         </nav>
 
-        {tab === 'add' && <AddPapers onAdded={handleAdded} />}
+        {tab === 'add' && <AddPapers onAdded={handleAdded} existing={dissections} />}
 
         {tab === 'library' && (
           n === 0
