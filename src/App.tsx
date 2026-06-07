@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import SyedBar from './components/SyedBar';
 import AddPapers from './components/AddPapers';
@@ -42,6 +42,32 @@ export default function App() {
     setFocusId(id);
   }
 
+  const importRef = useRef<HTMLInputElement>(null);
+  function handleImport(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const arr: unknown = Array.isArray(parsed) ? parsed : parsed?.dissections;
+        if (!Array.isArray(arr)) throw new Error('not a backup');
+        let next = dissections;
+        let added = 0;
+        for (const d of arr) {
+          if (d && typeof d === 'object' && (d as Dissection).id && (d as Dissection).facets) {
+            next = addDissection(d as Dissection);
+            added++;
+          }
+        }
+        setDissections(next);
+        setTab('library');
+        alert(added ? `Imported ${added} dissection${added === 1 ? '' : 's'}.` : 'No dissections found in that file.');
+      } catch {
+        alert('Could not read that file — pick a Paper Dissection JSON backup.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
   const n = dissections.length;
 
   return (
@@ -70,23 +96,28 @@ export default function App() {
         {tab === 'add' && <AddPapers onAdded={handleAdded} existing={dissections} />}
 
         {tab === 'library' && (
-          n === 0
-            ? <div className="empty">No papers dissected yet. Head to <button className="btn link" onClick={() => setTab('add')}>Add papers</button> to upload a PDF, paste text, or fetch a DOI.</div>
-            : <>
-                <div className="lib-export">
-                  <span className="muted small">Export {n} dissection{n === 1 ? '' : 's'}:</span>
-                  <button className="btn small" onClick={() => download(`dissections-${stamp()}.csv`, dissectionsCsv(dissections), 'text/csv')}>⬇ CSV</button>
-                  <button className="btn small" onClick={() => download(`dissections-${stamp()}.md`, dissectionsMarkdown(dissections), 'text/markdown')}>⬇ Markdown</button>
-                  <button className="btn small" title="Full re-importable backup" onClick={() => download(`paper-dissection-backup-${stamp()}.json`, libraryJson(dissections), 'application/json')}>⬇ JSON backup</button>
-                </div>
-                <div className="lib">
-                  {dissections.map(d => (
-                    <div id={`card-${d.id}`} key={d.id} className="lib-item">
-                      <DissectionCard d={d} onDelete={() => handleDelete(d.id)} />
-                    </div>
-                  ))}
-                </div>
-              </>
+          <>
+            <input ref={importRef} type="file" accept="application/json,.json" hidden
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleImport(f); e.target.value = ''; }} />
+            {n === 0
+              ? <div className="empty">No papers dissected yet. Head to <button className="btn link" onClick={() => setTab('add')}>Add papers</button> to upload a PDF, paste text, or fetch a DOI — or <button className="btn link" onClick={() => importRef.current?.click()}>import a JSON backup</button>.</div>
+              : <>
+                  <div className="lib-export">
+                    <span className="muted small">Export {n} dissection{n === 1 ? '' : 's'}:</span>
+                    <button className="btn small" onClick={() => download(`dissections-${stamp()}.csv`, dissectionsCsv(dissections), 'text/csv')}>⬇ CSV</button>
+                    <button className="btn small" onClick={() => download(`dissections-${stamp()}.md`, dissectionsMarkdown(dissections), 'text/markdown')}>⬇ Markdown</button>
+                    <button className="btn small" title="Full re-importable backup" onClick={() => download(`paper-dissection-backup-${stamp()}.json`, libraryJson(dissections), 'application/json')}>⬇ JSON backup</button>
+                    <button className="btn small" title="Restore from a JSON backup" onClick={() => importRef.current?.click()}>⬆ Import backup</button>
+                  </div>
+                  <div className="lib">
+                    {dissections.map(d => (
+                      <div id={`card-${d.id}`} key={d.id} className="lib-item">
+                        <DissectionCard d={d} onDelete={() => handleDelete(d.id)} />
+                      </div>
+                    ))}
+                  </div>
+                </>}
+          </>
         )}
 
         {tab === 'timeline' && <FacetTimeline dissections={dissections} onOpen={openPaper} />}
