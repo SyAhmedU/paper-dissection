@@ -1,7 +1,8 @@
 # Paper Dissection Workshop
 
 Break a research paper down to its parts. Feed it a **PDF**, a **batch of PDFs**,
-pasted **full text**, or a **DOI**, and it dissects each paper into **facets** —
+pasted **full text**, one or many **DOIs**, or a whole **journal** (pick it and
+choose from its real articles), and it dissects each paper into **facets** —
 the theory used, design/method, sample, measures, analysis techniques, software,
 data, findings, contributions, limitations and future directions — then lays the
 whole corpus out on a **facet × year timeline** and a **synthesis matrix**.
@@ -20,9 +21,12 @@ See suite memory `feedback-ai-extraction-verbatim`.
 
 ## How it works
 - **Inputs** (`src/components/AddPapers.tsx`): drop one/many PDFs (parsed in-browser
-  via lazy `pdfjs-dist`, no file upload), paste full text, or fetch a DOI
-  (`src/lib/doi.ts` → Crossref then OpenAlex; bibliographic facts come from the
-  real record, not the AI).
+  via lazy `pdfjs-dist`, no file upload), paste full text, fetch one or many DOIs
+  (`src/lib/doi.ts` → Crossref then OpenAlex), or pick a **journal**
+  (`src/components/AddJournal.tsx` + `src/lib/journal.ts` → OpenAlex
+  `autocomplete/sources` then `works?filter=primary_location.source.id:…`) and
+  choose from its real articles. Bibliographic facts come from the real record,
+  not the AI; bulk DOI + journal runs dedupe against the library and cap at 25.
 - **Extraction** (`src/lib/extract.ts` → `api/dissect.js`): Groq
   `llama-3.3-70b-versatile` with a strict no-fabrication prompt; deterministic
   regex fallback when there's no `GROQ_API_KEY` (reads only well-known

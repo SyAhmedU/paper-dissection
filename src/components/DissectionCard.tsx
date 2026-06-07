@@ -15,7 +15,7 @@ function Badges({ d }: { d: Dissection }) {
     ? 'Extracted by AI from the source text — verify against the paper'
     : 'Offline heuristic — limited; verify and edit';
   const depthLabel = d.depth === 'full-text' ? 'FULL TEXT' : 'ABSTRACT ONLY';
-  const inputLabel = d.source === 'pdf' ? 'PDF' : d.source === 'doi' ? 'DOI' : 'TEXT';
+  const inputLabel = d.source === 'pdf' ? 'PDF' : d.source === 'doi' ? 'DOI' : d.source === 'journal' ? 'JOURNAL' : 'TEXT';
   return (
     <span className="dc-badges">
       <span className="dc-badge input" title="Input type">{inputLabel}</span>

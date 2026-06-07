@@ -51,7 +51,7 @@ export default function App() {
           <div className="hero-eyebrow"><b />Research Suite · paper anatomy</div>
           <h1>Dissect a paper down to its <em>parts</em>.</h1>
           <p className="sub">
-            Upload a paper, a batch of papers, or paste a DOI — and the workshop breaks each one to the core,
+            Upload a paper, a batch of papers, paste DOIs, or pull a whole journal's articles — and the workshop breaks each one to the core,
             sorting every component into facets: theory used, design, sample, measures, analysis techniques, software, findings and more.
             Then see the whole corpus on a facet&nbsp;×&nbsp;year timeline and a synthesis matrix.
             Everything is extracted only from the source text — nothing is invented.

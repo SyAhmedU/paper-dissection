@@ -49,7 +49,7 @@ export interface Dissection {
   journal?: string;
   doi?: string;
   // Provenance + honesty about depth.
-  source: 'pdf' | 'text' | 'doi';
+  source: 'pdf' | 'text' | 'doi' | 'journal';
   depth: 'full-text' | 'abstract';
   extractedBy: 'ai' | 'heuristic';
   extractedAt: string;   // ISO

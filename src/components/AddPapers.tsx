@@ -6,12 +6,12 @@
 
 import { useMemo, useRef, useState } from 'react';
 import type { Dissection } from '../lib/types';
-import { newId } from '../lib/store';
-import { dissect } from '../lib/extract';
+import { buildDissection } from '../lib/build';
 import { extractPdfText } from '../lib/pdf';
 import { fetchDoi, normalizeDoi } from '../lib/doi';
+import AddJournal from './AddJournal';
 
-type Mode = 'upload' | 'paste' | 'doi';
+type Mode = 'upload' | 'paste' | 'doi' | 'journal';
 interface LogRow { name: string; status: string; state: 'work' | 'ok' | 'warn' | 'err'; }
 
 const MAX_DOIS = 25;        // cap a batch so it finishes quickly and stays polite to the APIs
@@ -35,31 +35,6 @@ function parseDois(text: string, existing: Set<string>): { dois: string[]; dropp
     dois.push(d);
   }
   return { dois, dropped, dupes };
-}
-
-async function build(opts: {
-  text: string;
-  source: Dissection['source'];
-  depth: Dissection['depth'];
-  meta?: { title?: string; authors?: string[]; year?: number; journal?: string; doi?: string };
-  titleGuess?: string;
-}): Promise<Dissection> {
-  const res = await dissect({ text: opts.text, title: opts.meta?.title || opts.titleGuess, depth: opts.depth });
-  return {
-    id: newId(),
-    title: opts.meta?.title || res.title || opts.titleGuess || 'Untitled paper',
-    authors: opts.meta?.authors || res.authors,
-    year: opts.meta?.year ?? res.year,
-    journal: opts.meta?.journal || res.journal,
-    doi: opts.meta?.doi,
-    source: opts.source,
-    depth: opts.depth,
-    extractedBy: res.source,
-    extractedAt: new Date().toISOString(),
-    textLen: opts.text.length,
-    facets: res.facets,
-    notes: res.notes,
-  };
 }
 
 export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissection[]) => void; existing: Dissection[] }) {
@@ -98,7 +73,7 @@ export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissect
           continue;
         }
         patchLast({ status: `dissecting ${pages} pages…` });
-        const d = await build({ text, source: 'pdf', depth: 'full-text', titleGuess });
+        const d = await buildDissection({ text, source: 'pdf', depth: 'full-text', titleGuess });
         added.push(d);
         patchLast({ status: `dissected → ${count(d)} items (${d.extractedBy})`, state: 'ok' });
       } catch (e) {
@@ -117,7 +92,7 @@ export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissect
     try {
       // Treat a short paste as abstract-depth, a long one as full text.
       const depth = text.length < 2500 ? 'abstract' : 'full-text';
-      const d = await build({ text, source: 'text', depth, meta: { title: pasteTitle || undefined } });
+      const d = await buildDissection({ text, source: 'text', depth, meta: { title: pasteTitle || undefined } });
       onAdded([d]);
       patchLast({ status: `dissected → ${count(d)} items (${d.extractedBy}, ${depth})`, state: 'ok' });
       setPaste(''); setPasteTitle('');
@@ -141,7 +116,7 @@ export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissect
           patchLast({ status: 'no abstract from Crossref/OpenAlex — paste the text instead.', state: 'warn' });
         } else {
           patchLast({ status: 'dissecting abstract…' });
-          const d = await build({
+          const d = await buildDissection({
             text: r.abstract, source: 'doi', depth: 'abstract',
             meta: { title: r.title, authors: r.authors, year: r.year, journal: r.journal, doi: r.doi },
           });
@@ -161,6 +136,7 @@ export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissect
         <button className={mode === 'upload' ? 'on' : ''} onClick={() => setMode('upload')}>📄 Upload PDF(s)</button>
         <button className={mode === 'paste' ? 'on' : ''} onClick={() => setMode('paste')}>✎ Paste text</button>
         <button className={mode === 'doi' ? 'on' : ''} onClick={() => setMode('doi')}>🔗 DOIs</button>
+        <button className={mode === 'journal' ? 'on' : ''} onClick={() => setMode('journal')}>📚 Journal</button>
       </div>
 
       {mode === 'upload' && (
@@ -214,6 +190,8 @@ export default function AddPapers({ onAdded, existing }: { onAdded: (ds: Dissect
           </div>
         </div>
       )}
+
+      {mode === 'journal' && <AddJournal onAdded={onAdded} existing={existing} />}
 
       {log.length > 0 && (
         <ul className="add-log">
