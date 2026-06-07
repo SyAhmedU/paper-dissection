@@ -1,3 +1,5 @@
 {
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }]
+  "redirects": [
+    { "source": "/(.*)", "destination": "https://papercards.vercel.app/", "permanent": true }
+  ]
 }

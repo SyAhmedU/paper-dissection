@@ -1,5 +1,11 @@
 # Paper Dissection Workshop
 
+> **⚠ Retired (2026-06-07) — merged into [PaperCards](https://papercards.vercel.app).**
+> Every capability here now lives in PaperCards as its **Dissection** depth: PDF / paste / DOI /
+> bulk-DOI / journal-picker inputs, the 13-facet view, facet × year timeline and synthesis matrix.
+> `paper-dissection.vercel.app` now 308-redirects to PaperCards, and this repo is archived
+> (read-only). Do all dissection work in `paperpulse/` (PaperCards). Nothing was lost.
+
 Break a research paper down to its parts. Feed it a **PDF**, a **batch of PDFs**,
 pasted **full text**, one or many **DOIs**, or a whole **journal** (pick it and
 choose from its real articles), and it dissects each paper into **facets** —
