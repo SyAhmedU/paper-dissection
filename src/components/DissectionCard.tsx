@@ -8,6 +8,32 @@
 import { useState } from 'react';
 import type { Dissection, FacetKey, FacetItem } from '../lib/types';
 import { FACETS, facetItemLink } from '../lib/types';
+import { natureOf, NATURE_BY_KEY, estimateTimeFlow, weeksLabel } from '../lib/nature';
+
+const TF_COLORS = ['#FF9656', '#F14575', '#9270F4', '#22d3ee', '#1b8a5a', '#c97a1a'];
+
+function TimeFlowBar({ d }: { d: Dissection }) {
+  const tf = estimateTimeFlow(d);
+  return (
+    <section className="dc-timeflow">
+      <div className="dc-tf-head">
+        <span className="dc-tf-title">⏳ Probable time flow</span>
+        <span className="dc-tf-total">{weeksLabel(tf.totalWeeks)}{tf.longitudinal ? ' · longitudinal' : ''}</span>
+      </div>
+      <div className="dc-tf-bar">
+        {tf.phases.map((p, i) => (
+          <div key={i} className="dc-tf-seg" style={{ flexGrow: p.weeks, background: TF_COLORS[i % TF_COLORS.length] }} title={`${p.phase} · ${p.weeks} weeks`} />
+        ))}
+      </div>
+      <div className="dc-tf-legend">
+        {tf.phases.map((p, i) => (
+          <span key={i} className="dc-tf-leg"><span className="dc-tf-dot" style={{ background: TF_COLORS[i % TF_COLORS.length] }} />{p.phase} <b>{p.weeks}w</b></span>
+        ))}
+      </div>
+      <div className="dc-tf-note">Estimated planning timeline for a {NATURE_BY_KEY[tf.nature].label.toLowerCase()} study — heuristic, not extracted from the paper.</div>
+    </section>
+  );
+}
 
 function Badges({ d }: { d: Dissection }) {
   const srcLabel = d.extractedBy === 'ai' ? 'AI-EXTRACTED' : 'HEURISTIC';
@@ -16,8 +42,10 @@ function Badges({ d }: { d: Dissection }) {
     : 'Offline heuristic — limited; verify and edit';
   const depthLabel = d.depth === 'full-text' ? 'FULL TEXT' : 'ABSTRACT ONLY';
   const inputLabel = d.source === 'pdf' ? 'PDF' : d.source === 'doi' ? 'DOI' : d.source === 'journal' ? 'JOURNAL' : 'TEXT';
+  const nm = NATURE_BY_KEY[natureOf(d)];
   return (
     <span className="dc-badges">
+      <span className="dc-badge nature" style={{ ['--nat' as string]: nm.color }} title="Nature of study (derived from the methods)">{nm.icon} {nm.label}</span>
       <span className="dc-badge input" title="Input type">{inputLabel}</span>
       <span className={`dc-badge depth ${d.depth}`} title="How much of the paper was dissected">{depthLabel}</span>
       <span className={`dc-badge src ${d.extractedBy}`} title={srcTitle}>{srcLabel}</span>
@@ -80,6 +108,8 @@ export default function DissectionCard({ d, onDelete }: { d: Dissection; onDelet
           {d.notes.map((n, i) => <li key={i}>{n}</li>)}
         </ul>
       ) : null}
+
+      <TimeFlowBar d={d} />
 
       <div className="dc-facetcount mono">{totalItems} items across {facetsWith.length} facets · {d.textLen.toLocaleString()} chars dissected</div>
 

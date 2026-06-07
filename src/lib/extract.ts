@@ -9,9 +9,10 @@
 // the source doesn't back. Numbers inside `detail` are kept only when they
 // appear verbatim in the text.
 
-import type { FacetKey, FacetItem, ExtractedDissection } from './types';
+import type { FacetKey, FacetItem, ExtractedDissection, StudyNature } from './types';
 import { FACET_KEYS, emptyFacets } from './types';
 import { norm, evidenceFound, guardNumbersInDetail } from './guards';
+import { isStudyNature } from './nature';
 
 export interface ExtractInput {
   text: string;
@@ -24,6 +25,7 @@ export interface ExtractResult {
   authors?: string[];
   year?: number;
   journal?: string;
+  nature?: StudyNature;
   facets: Record<FacetKey, FacetItem[]>;
   notes: string[];
   source: 'ai' | 'heuristic';
@@ -85,6 +87,7 @@ export async function dissect(input: ExtractInput): Promise<ExtractResult> {
             authors: Array.isArray(d.authors) ? d.authors : undefined,
             year: typeof d.year === 'number' ? d.year : undefined,
             journal: d.journal?.trim() || undefined,
+            nature: isStudyNature(d.nature) ? d.nature : undefined,
             facets, notes, source: 'ai',
           };
         }

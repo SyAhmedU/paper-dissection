@@ -24,6 +24,7 @@ export async function buildDissection(opts: {
     doi: opts.meta?.doi,
     source: opts.source,
     depth: opts.depth,
+    nature: res.nature,
     extractedBy: res.source,
     extractedAt: new Date().toISOString(),
     textLen: opts.text.length,

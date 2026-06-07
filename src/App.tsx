@@ -5,9 +5,10 @@ import AddPapers from './components/AddPapers';
 import DissectionCard from './components/DissectionCard';
 import FacetTimeline from './components/FacetTimeline';
 import SynthesisMatrix from './components/SynthesisMatrix';
-import type { Dissection } from './lib/types';
+import type { Dissection, StudyNature } from './lib/types';
 import { loadAll, addDissection, removeDissection } from './lib/store';
 import { download, stamp, dissectionsCsv, dissectionsMarkdown, libraryJson } from './lib/export';
+import { NATURES, natureOf } from './lib/nature';
 
 type Tab = 'add' | 'library' | 'timeline' | 'matrix';
 
@@ -69,6 +70,9 @@ export default function App() {
   }
 
   const n = dissections.length;
+  const [natureFilter, setNatureFilter] = useState<StudyNature | 'all'>('all');
+  const natureCounts = NATURES.map(nm => ({ nm, count: dissections.filter(d => natureOf(d) === nm.key).length })).filter(x => x.count > 0);
+  const shownLib = natureFilter === 'all' ? dissections : dissections.filter(d => natureOf(d) === natureFilter);
 
   return (
     <>
@@ -109,8 +113,19 @@ export default function App() {
                     <button className="btn small" title="Full re-importable backup" onClick={() => download(`paper-dissection-backup-${stamp()}.json`, libraryJson(dissections), 'application/json')}>⬇ JSON backup</button>
                     <button className="btn small" title="Restore from a JSON backup" onClick={() => importRef.current?.click()}>⬆ Import backup</button>
                   </div>
+                  {natureCounts.length > 1 && (
+                    <div className="nature-filter">
+                      <span className="muted small">Nature of study:</span>
+                      <button className={`nat-chip ${natureFilter === 'all' ? 'on' : ''}`} onClick={() => setNatureFilter('all')}>All <span className="nat-n">{n}</span></button>
+                      {natureCounts.map(({ nm, count }) => (
+                        <button key={nm.key} className={`nat-chip ${natureFilter === nm.key ? 'on' : ''}`} style={{ ['--nat' as string]: nm.color }} onClick={() => setNatureFilter(nm.key)}>
+                          {nm.icon} {nm.label} <span className="nat-n">{count}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <div className="lib">
-                    {dissections.map(d => (
+                    {shownLib.map(d => (
                       <div id={`card-${d.id}`} key={d.id} className="lib-item">
                         <DissectionCard d={d} onDelete={() => handleDelete(d.id)} />
                       </div>

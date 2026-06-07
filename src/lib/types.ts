@@ -27,6 +27,18 @@ export type FacetKey =
   | 'limitations'
   | 'future';
 
+// The overall nature of a study — a single high-level methodology class used
+// for filtering and the probable time-flow estimate. Derived deterministically
+// from the extracted design/analysis (see lib/nature.ts), or set by the AI.
+export type StudyNature =
+  | 'quantitative'
+  | 'qualitative'
+  | 'mixed-methods'
+  | 'case-report'
+  | 'review'
+  | 'theoretical'
+  | 'other';
+
 // A suite deep-link target for a facet item (e.g. theory → TheoryScope).
 export interface FacetLink {
   tool: 'theoryscope' | 'scalescope' | 'toolsscope';
@@ -51,6 +63,7 @@ export interface Dissection {
   // Provenance + honesty about depth.
   source: 'pdf' | 'text' | 'doi' | 'journal';
   depth: 'full-text' | 'abstract';
+  nature?: StudyNature;   // optional; if absent the UI derives it from the facets
   extractedBy: 'ai' | 'heuristic';
   extractedAt: string;   // ISO
   textLen: number;       // characters of source text the dissection saw
@@ -66,6 +79,7 @@ export interface ExtractedDissection {
   authors?: string[];
   year?: number;
   journal?: string;
+  nature?: StudyNature;
   facets: Partial<Record<FacetKey, FacetItem[]>>;
   notes?: string[];
 }

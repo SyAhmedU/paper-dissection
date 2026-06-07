@@ -74,6 +74,28 @@
 .dc-notes li::before { content: '▸ '; color: var(--accent-warm-b); }
 .dc-facetcount { font-size: .68rem; color: var(--ink-mute); margin: 14px 0 4px; letter-spacing: .04em; }
 
+.dc-badge.nature { color: var(--nat, var(--ink-mute)); border-color: color-mix(in srgb, var(--nat, var(--line)) 45%, transparent); }
+
+/* probable time-flow (estimated) */
+.dc-timeflow { margin: 14px 0 6px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-tint); }
+.dc-tf-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+.dc-tf-title { font-weight: 700; font-size: .9rem; }
+.dc-tf-total { font-family: var(--mono); font-size: .74rem; color: var(--ink-mute); }
+.dc-tf-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; gap: 1px; }
+.dc-tf-seg { min-width: 4px; }
+.dc-tf-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 9px; }
+.dc-tf-leg { font-size: .76rem; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 5px; }
+.dc-tf-leg b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.dc-tf-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.dc-tf-note { font-size: .72rem; color: var(--ink-faint); font-style: italic; margin-top: 8px; }
+
+/* nature-of-study filter */
+.nature-filter { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+.nat-chip { font-family: inherit; font-weight: 600; font-size: .8rem; color: var(--ink-soft); background: var(--bg-elev); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 6px; }
+.nat-chip:hover { color: var(--ink); border-color: var(--nat, var(--accent-warm-b)); }
+.nat-chip.on { color: #fff; background: var(--nat, var(--accent-warm-b)); border-color: transparent; }
+.nat-n { font-family: var(--mono); font-size: .68rem; opacity: .8; }
+
 .dc-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 8px; }
 .dc-facet { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; background: var(--bg-tint); border-left: 3px solid var(--facet, var(--line)); }
 .dc-facet-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }

@@ -30,6 +30,7 @@ const SCHEMA_HINT = `{
   "authors"?: string[],
   "year"?: number,
   "journal"?: string,
+  "nature"?: "quantitative"|"qualitative"|"mixed-methods"|"case-report"|"review"|"theoretical",
   "facets": {
     "theory"?: Item[], "constructs"?: Item[], "hypotheses"?: Item[],
     "design"?: Item[], "sample"?: Item[], "measures"?: Item[],
@@ -55,6 +56,7 @@ Output rules:
 - Return ONLY a JSON object (no markdown, no code fences, no prose).
 - "text" is the concise canonical name of the item; "detail" is optional elaboration grounded in the text.
 - title/authors/year/journal: include only if clearly present in the text (usually the first page). Omit if unsure.
+- nature: classify the study's overall methodology as exactly one of "quantitative", "qualitative", "mixed-methods", "case-report", "review" (systematic review / meta-analysis), or "theoretical" (conceptual, no empirical data) — based on the methods the text describes. Omit if genuinely unclear.
 - "notes": 0–3 short caveats about the dissection (e.g. "methods section not present in supplied text").
 
 Shape:
