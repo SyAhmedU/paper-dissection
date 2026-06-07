@@ -7,6 +7,7 @@ import FacetTimeline from './components/FacetTimeline';
 import SynthesisMatrix from './components/SynthesisMatrix';
 import type { Dissection } from './lib/types';
 import { loadAll, addDissection, removeDissection } from './lib/store';
+import { download, stamp, dissectionsCsv, dissectionsMarkdown, libraryJson } from './lib/export';
 
 type Tab = 'add' | 'library' | 'timeline' | 'matrix';
 
@@ -71,13 +72,21 @@ export default function App() {
         {tab === 'library' && (
           n === 0
             ? <div className="empty">No papers dissected yet. Head to <button className="btn link" onClick={() => setTab('add')}>Add papers</button> to upload a PDF, paste text, or fetch a DOI.</div>
-            : <div className="lib">
-                {dissections.map(d => (
-                  <div id={`card-${d.id}`} key={d.id} className="lib-item">
-                    <DissectionCard d={d} onDelete={() => handleDelete(d.id)} />
-                  </div>
-                ))}
-              </div>
+            : <>
+                <div className="lib-export">
+                  <span className="muted small">Export {n} dissection{n === 1 ? '' : 's'}:</span>
+                  <button className="btn small" onClick={() => download(`dissections-${stamp()}.csv`, dissectionsCsv(dissections), 'text/csv')}>⬇ CSV</button>
+                  <button className="btn small" onClick={() => download(`dissections-${stamp()}.md`, dissectionsMarkdown(dissections), 'text/markdown')}>⬇ Markdown</button>
+                  <button className="btn small" title="Full re-importable backup" onClick={() => download(`paper-dissection-backup-${stamp()}.json`, libraryJson(dissections), 'application/json')}>⬇ JSON backup</button>
+                </div>
+                <div className="lib">
+                  {dissections.map(d => (
+                    <div id={`card-${d.id}`} key={d.id} className="lib-item">
+                      <DissectionCard d={d} onDelete={() => handleDelete(d.id)} />
+                    </div>
+                  ))}
+                </div>
+              </>
         )}
 
         {tab === 'timeline' && <FacetTimeline dissections={dissections} onOpen={openPaper} />}

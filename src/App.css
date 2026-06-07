@@ -42,6 +42,8 @@
 .add-log-row.work { border-left: 3px solid var(--accent-warm-c); }
 
 /* ── Library ────────────────────────────────────────────────────── */
+.lib-export { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.sm-export { display: inline-flex; gap: 6px; }
 .lib { display: flex; flex-direction: column; gap: 22px; }
 .lib-item { scroll-margin-top: 70px; }
 .lib-item.flash .dc { animation: dc-flash 1.4s ease; }

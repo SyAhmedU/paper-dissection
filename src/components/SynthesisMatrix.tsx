@@ -11,6 +11,7 @@
 import { useMemo, useState } from 'react';
 import type { Dissection, FacetKey, FacetItem, FacetMeta } from '../lib/types';
 import { FACETS, FACET_BY_KEY, facetItemLink } from '../lib/types';
+import { download, stamp, dissectionsCsv, dissectionsMarkdown } from '../lib/export';
 
 const COLS = FACETS.filter(f => f.inMatrix);
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -95,6 +96,10 @@ export default function SynthesisMatrix({ dissections, onOpen }: { dissections: 
           Chips shared by ≥2 papers are highlighted with a ×count; dashed chips are unverified.
         </p>
         <span style={{ flex: 1 }} />
+        <div className="sm-export">
+          <button className="btn small" title="Download papers × facets as CSV" onClick={() => download(`synthesis-${stamp()}.csv`, dissectionsCsv(papers), 'text/csv')}>⬇ CSV</button>
+          <button className="btn small" title="Download as a Markdown table" onClick={() => download(`synthesis-${stamp()}.md`, dissectionsMarkdown(papers), 'text/markdown')}>⬇ Markdown</button>
+        </div>
         <div className="seg sm-seg">
           <button className={orient === 'facetRows' ? 'on' : ''} onClick={() => setOrient('facetRows')}>Papers as columns</button>
           <button className={orient === 'paperRows' ? 'on' : ''} onClick={() => setOrient('paperRows')}>Papers as rows</button>
